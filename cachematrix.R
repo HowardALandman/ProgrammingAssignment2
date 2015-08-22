@@ -20,7 +20,7 @@ makeCacheMatrix <- function(x = matrix()) {
 	## Function to get the cached matrix
         get <- function() x
 	## Function to set the cached inverse
-        setinverse <- function(mean) m <<- mean
+        setinverse <- function(inv) m <<- inv
 	## Function to get the cached inverse
         getinverse <- function() m
         list(set = set, get = get,
@@ -47,24 +47,27 @@ cacheSolve <- function(x, ...) {
 }
 
 ## Test the above code.
-testCacheSolve <- function() {
+testCacheSolve <- function(reps=100,size=2) {
+	## reps = number of tests to perform
+	## size = number of rows (and columns) of the square matrices
 	errors = 0
-	id = diag(2)	## 2x2 identity matrix
+	id = diag(size)	## identity matrix
 	## Test basic solving
-	for (i in 1:100) {
-		a = replicate(2, rnorm(2))	## random 2x2 matrix
+	for (i in 1:reps) {
+		a = replicate(size,rnorm(size))	## random square matrix
 		ac = makeCacheMatrix(a)
 		ai = cacheSolve(ac)
 		## A matrix times its inverse should equal the identity matrix.
 		if (!all.equal((ai %*% a),id)) {
-			warning("Inverse times matrix not equal to identity")
 			errors = errors + 1
 		}
 	}
+	## Print test results.
+	## Note that cat() does what we want here while print() doesn't.
 	if (errors > 0) {
-		print(errors," errors")
+		cat(paste(errors,"errors out of",reps,"tests"))
 	} else {
-		print("all passed")
+		cat(paste("all",reps,"tests passed"))
 	}
 	## Note that none of this tests the caching.
 }
